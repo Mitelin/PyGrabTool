@@ -1,11 +1,15 @@
 import pytesseract
-import pyscreenshot as ImageGrab
+import pyscreenshot as imagegrab
 from PIL import Image, ImageEnhance
 import tkinter as tk
 import pyperclip
+import configparser
 
-# Cesta k Tesseractu – uprav jen pokud máš jinde
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+config = configparser.ConfigParser()
+config.read('config.cfg')
+
+tesseract_path = config.get('tesseract', 'path')
+pytesseract.pytesseract.tesseract_cmd = tesseract_path
 
 def capture_area():
     coords = {}
@@ -23,10 +27,10 @@ def capture_area():
 
     def on_key(event):
         if event.keysym == 'Escape':
-            print("❌ Výběr zrušen klávesou Escape.")
+            print("Selection stopped by Escape.")
             root.destroy()
 
-    # GUI – výběrové plátno
+    # GUI
     root = tk.Tk()
     root.attributes('-fullscreen', True)
     root.attributes('-alpha', 0.3)
@@ -43,12 +47,12 @@ def capture_area():
     root.bind("<Key>", on_key)
     root.mainloop()
 
-    # Kontrola, jestli se vůbec něco vybralo
+    # Check if something was selected
     if 'x1' not in coords or 'x2' not in coords:
-        print("⚠️ Výběr neproběhl.")
+        print("No selection.")
         return
 
-    # Vypočítání oblasti pro snímek
+    # Calculate area for screenshot
     bbox = (
         min(coords['x1'], coords['x2']),
         min(coords['y1'], coords['y2']),
@@ -56,27 +60,27 @@ def capture_area():
         max(coords['y1'], coords['y2'])
     )
 
-    # Screenshot dané oblasti
-    image = ImageGrab.grab(bbox)
+    # Screenshot selected area
+    image = imagegrab.grab(bbox)
 
-    # 📈 Předzpracování pro lepší čitelnost:
+    # Screenshot conversion for better readability:
     gray = image.convert('L')  # grayscale
-    scaled = gray.resize((gray.width * 2, gray.height * 2), Image.LANCZOS)  # zvětšení
-    contrast = ImageEnhance.Contrast(scaled).enhance(1.5)  # zvýšení kontrastu
+    scaled = gray.resize((gray.width * 2, gray.height * 2), Image.LANCZOS)  # Resize
+    contrast = ImageEnhance.Contrast(scaled).enhance(1.5)  # Contrast
 
-    # 🧠 OCR rozpoznání textu
+    # OCR Text detection
     text = pytesseract.image_to_string(contrast, lang='eng')
 
-    # ✂️ Úprava mezer
+    # Fix the spaces
     cleaned = '\n'.join(' '.join(line.split()) for line in text.splitlines() if line.strip())
 
-    # 📋 Výstup
+    # Output
     if cleaned:
         pyperclip.copy(cleaned)
-        print("📋 Text zkopírován do schránky!")
-        print("--- Výsledek OCR ---\n" + cleaned)
+        print("Text copied to clipboard.!")
+        print("--- Output OCR ---\n" + cleaned)
     else:
-        print("⚠️ Žádný text nebyl detekován.")
+        print("No text found.")
 
 if __name__ == "__main__":
     capture_area()
