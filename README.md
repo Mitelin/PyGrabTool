@@ -18,7 +18,7 @@ Pomocí jednoduchého výběru myší přes GUI získáš přesný text z obrazo
 
 ## Použití
 
-1. Spusť skript `main.py`
+1. Spusť skript `Pygrab.py`
 2. Myší označ oblast s textem (například chybovou hlášku)
 3. Text se přečte a vloží do schránky
 4. Vlož ho pomocí `Ctrl + V` kamkoli potřebuješ
@@ -106,7 +106,7 @@ Use simple mouse selection to grab any visible text and get it ready for pasting
 
 ## Usage
 
-1. Run `main.py`
+1. Run `Pygrab.py`
 2. Select the text region with your mouse
 3. The tool runs OCR and puts the result into clipboard
 4. Paste anywhere using `Ctrl + V`
